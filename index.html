@@ -3,137 +3,468 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Siddhartha Reddy - Portfolio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 text-gray-800 font-sans antialiased p-4 md:p-10">
+    <title>Siddhartha Reddy - Terminal Logs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0D1117;
+            --text-color: #E6E6E6;
+            --accent-color: #F59E0B;
+            --border-color: #30363D;
+            --muted-color: #8B949E;
+        }
 
-    <div class="max-w-5xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden">
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Brutalist Grid Layout */
+        .grid-matrix {
+            display: grid;
+            gap: 1px;
+            background-color: var(--border-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .grid-cell {
+            background-color: var(--bg-color);
+            padding: 1.5rem;
+        }
+
+        /* Header Elements */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 0.25rem 0.5rem;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        /* Hero & Typewriter */
+        .hero {
+            margin-bottom: 2rem;
+            border-left: 1px solid var(--accent-color);
+            padding-left: 1.5rem;
+        }
+
+        .typewriter {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid var(--accent-color);
+            animation: typing 2.5s steps(60, end), blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--accent-color); } }
+
+        @media (prefers-reduced-motion: reduce) {
+            .typewriter {
+                animation: none;
+                border-right: none;
+                white-space: normal;
+                overflow: visible;
+            }
+            html { scroll-behavior: auto !important; }
+        }
+
+        /* Filters */
+        .filter-prompt { color: var(--muted-color); margin-bottom: 1rem; }
+        .filter-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+        .tag-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--muted-color);
+            padding: 0.25rem 0.75rem;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        .tag-btn:hover, .tag-btn.active {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        /* Log Table */
+        .log-header {
+            display: grid;
+            grid-template-columns: 120px 2fr 80px 2fr;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            color: var(--muted-color);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .log-entry {
+            display: grid;
+            grid-template-columns: 120px 2fr 80px 2fr;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .log-entry.active-nav {
+            background-color: rgba(245, 158, 11, 0.05);
+            border-left: 2px solid var(--accent-color);
+        }
+
+        .log-entry:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+        .log-meta { color: var(--muted-color); font-size: 12px; }
+        .log-title { color: var(--text-color); font-weight: 600; }
+        .log-latency { color: var(--accent-color); font-size: 12px; text-align: right; }
+        .log-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .log-tag { border: 1px solid var(--border-color); padding: 0.1rem 0.4rem; font-size: 10px; color: var(--muted-color); }
+
+        /* Expansion Detail */
+        .log-details {
+            display: none;
+            grid-column: 1 / -1;
+            padding: 1.5rem 0 0.5rem 0;
+            border-top: 1px dashed var(--border-color);
+            margin-top: 1rem;
+        }
+        .log-entry.expanded .log-details { display: block; }
         
-        <!-- Header Section -->
-        <header class="bg-slate-900 text-white p-8 md:p-12">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">Siddhartha Reddy[cite: 1]</h1>
-            <div class="flex flex-wrap gap-4 text-sm md:text-base text-gray-300">
-                <p>siddhuseelam@gmail.com[cite: 1]</p>
-                <p>|</p>
-                <p>(+91) 7672015134[cite: 1]</p>
-                <p>|</p>
-                <p>Hyderabad, India[cite: 1]</p>
+        .code-snippet {
+            background-color: #05080c;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            margin-top: 1rem;
+            color: #a5d6ff;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+
+        /* Keybind helper */
+        .keybinds {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            padding: 0.5rem 1rem;
+            font-size: 12px;
+            color: var(--muted-color);
+        }
+        .key { border: 1px solid var(--border-color); padding: 0.1rem 0.3rem; color: var(--text-color); }
+
+    </style>
+</head>
+<body>
+
+    <header class="header-bar mono">
+        <div>SYS_TIME: <span id="clock" class="text-accent"></span> <span style="margin-left: 1rem; color: var(--muted-color);">LOC: Hyderabad, India[cite: 2]</span></div>
+        <div class="badge">Available for Q3/Q4</div>
+    </header>
+
+    <main class="grid-matrix">
+        <!-- Identity Cell -->
+        <div class="grid-cell">
+            <h1 class="mono" style="font-size: 1.5rem; color: var(--accent-color); margin-bottom: 0.5rem;">Siddhartha Reddy[cite: 2]</h1>
+            <div class="mono" style="color: var(--muted-color); margin-bottom: 1.5rem; font-size: 12px;">
+                > usr_email: siddhuseelam@gmail.com[cite: 2]<br>
+                > usr_phone: (+91) 7672015134[cite: 2]<br>
+                > edu_inst: Gokaraju Rangaraju Institute of Engineering[cite: 2]<br>
+                > edu_deg: BTech in Computer Science and Engineering (Artificial Intelligence)[cite: 2] | GPA: 8.73[cite: 2]<br>
+                > edu_grad: Expected 2027[cite: 2]<br>
+                > networks: LinkedIn, GitHub[cite: 2]
             </div>
-            <div class="flex gap-4 mt-4 text-blue-400">
-                <a href="#" class="hover:text-blue-300 transition">LinkedIn[cite: 1]</a>
-                <a href="#" class="hover:text-blue-300 transition">GitHub[cite: 1]</a>
+            <div class="hero mono">
+                <div class="typewriter text-accent">> PHILOSOPHY: ENGINEER SCALABLE SYSTEMS AND AI-DRIVEN SOLUTIONS WITH RAW PRECISION.</div>
             </div>
-        </header>
-
-        <div class="p-8 md:p-12 space-y-12">
-            
-            <!-- Education -->
-            <section>
-                <h2 class="text-2xl font-bold border-b-2 border-slate-200 pb-2 mb-6 text-slate-800">Education</h2>
-                <div class="flex flex-col md:flex-row justify-between mb-2">
-                    <h3 class="text-xl font-semibold">Gokaraju Rangaraju Institute of Engineering[cite: 1]</h3>
-                    <span class="text-gray-500 font-medium">Expected 2027[cite: 1]</span>
-                </div>
-                <p class="text-gray-700">BTech in Computer Science and Engineering (Artificial Intelligence)[cite: 1] | GPA: 8.73[cite: 1]</p>
-                <p class="text-gray-500 text-sm">Hyderabad[cite: 1]</p>
-            </section>
-
-            <!-- Technical Skills -->
-            <section>
-                <h2 class="text-2xl font-bold border-b-2 border-slate-200 pb-2 mb-6 text-slate-800">Technical Skills</h2>
-                <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
-                    <li><span class="font-bold text-slate-900">Languages & Databases:</span> Java, Python, JavaScript, SQL, PostgreSQL, MySQL, MongoDB[cite: 1]</li>
-                    <li><span class="font-bold text-slate-900">Backend & Frameworks:</span> REST APIs, Node.js, Express, Flask[cite: 1]</li>
-                    <li><span class="font-bold text-slate-900">Frontend & UI:</span> React, Tailwind CSS, Bootstrap[cite: 1]</li>
-                    <li><span class="font-bold text-slate-900">DevOps & Tools:</span> Git, GitHub Actions, Docker, Postman, Linux[cite: 1]</li>
-                    <li><span class="font-bold text-slate-900">Core Concepts:</span> OOP, Data Structures & Algorithms, JWT Authentication, CI/CD[cite: 1]</li>
-                    <li><span class="font-bold text-slate-900">AI & Data:</span> TensorFlow, PyTorch, Pandas, NumPy, OpenCV[cite: 1]</li>
-                    <li><span class="font-bold text-slate-900">Creative Tools:</span> Blender, After Effects, Premiere Pro, Photoshop[cite: 1]</li>
-                </ul>
-            </section>
-
-            <!-- Involvement & Extracurriculars -->
-            <section>
-                <h2 class="text-2xl font-bold border-b-2 border-slate-200 pb-2 mb-6 text-slate-800">Involvement & Extracurriculars</h2>
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-lg font-semibold text-slate-800">J.P. Morgan Chase Code for Good[cite: 1]</h3>
-                        <p class="text-gray-700 mt-2">Spearheaded a 7-member agile engineering team to architect a MERN-stack application for automating leftover food distribution; delivered the solution within a highly competitive 24-hour sprint.[cite: 1]</p>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-slate-800">Secretary, Robotics Club GRIET[cite: 1]</h3>
-                        <p class="text-gray-700 mt-2">Orchestrated inter-college events and technical workshops by coordinating technical and creative teams; mentored junior members in end-to-end robotics project development.[cite: 1]</p>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-slate-800">Smart India Hackathon[cite: 1]</h3>
-                        <p class="text-gray-700 mt-2">Engineered the frontend architecture for an urban planning platform; directed a multidisciplinary team through requirement analysis to deliver a centralized municipal resource-sharing platform.[cite: 1]</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Projects -->
-            <section>
-                <h2 class="text-2xl font-bold border-b-2 border-slate-200 pb-2 mb-6 text-slate-800">Projects</h2>
-                <div class="space-y-8">
-                    
-                    <!-- Project 1 -->
-                    <div>
-                        <div class="flex flex-col md:flex-row justify-between mb-1">
-                            <h3 class="text-xl font-bold text-slate-900">Xerox Automation System[cite: 1]</h3>
-                            <span class="text-gray-500 font-medium">Mar 2025 - Present[cite: 1]</span>
-                        </div>
-                        <p class="text-blue-600 font-medium mb-3">Full-Stack Automation Platform | Live Demo: zerox.studio[cite: 1]</p>
-                        <ul class="list-disc list-inside text-gray-700 space-y-2">
-                            <li>Architected a React and Node.js automation platform to streamline print pre-ordering and document workflows.[cite: 1]</li>
-                            <li>Onboarded 867 users in the first week after launch, highlighting rapid user growth and platform scalability.[cite: 1]</li>
-                            <li>Engineered a secure Express.js backend with OTP/QR authentication and integrated payment processing.[cite: 1]</li>
-                            <li>Implemented batch PDF upload pipelines to optimize high-volume document handling and request reliability.[cite: 1]</li>
-                            <li><span class="font-semibold">Skills:</span> React, Node.js, Express, MongoDB, Functional Testing[cite: 1]</li>
-                        </ul>
-                    </div>
-
-                    <!-- Project 2 -->
-                    <div>
-                        <div class="flex flex-col md:flex-row justify-between mb-1">
-                            <h3 class="text-xl font-bold text-slate-900">HDR Image Reconstruction using CNN[cite: 1]</h3>
-                            <span class="text-gray-500 font-medium">2025[cite: 1]</span>
-                        </div>
-                        <p class="text-blue-600 font-medium mb-3">Computer Vision Research Project[cite: 1]</p>
-                        <ul class="list-disc list-inside text-gray-700 space-y-2">
-                            <li>Engineered a PyTorch CNN pipeline for converting LDR images into high-fidelity HDR outputs.[cite: 1]</li>
-                            <li>Optimized image preprocessing and inference workflows using OpenCV and NumPy computer vision operations.[cite: 1]</li>
-                            <li>Developed a Streamlit application for real-time HDR generation, visualization, and image comparison.[cite: 1]</li>
-                            <li><span class="font-semibold">Skills:</span> PyTorch, CNNs, Computer Vision, Streamlit, OpenCV, NumPy[cite: 1]</li>
-                        </ul>
-                    </div>
-
-                    <!-- Project 3 -->
-                    <div>
-                        <div class="flex flex-col md:flex-row justify-between mb-1">
-                            <h3 class="text-xl font-bold text-slate-900">Stick Typing - AI Powered Controller Typing System[cite: 1]</h3>
-                            <span class="text-gray-500 font-medium">2026[cite: 1]</span>
-                        </div>
-                        <p class="text-blue-600 font-medium mb-3">Human-Computer Interaction Research[cite: 1]</p>
-                        <ul class="list-disc list-inside text-gray-700 space-y-2">
-                            <li>Designed a dual-thumbstick typing interface to improve controller-based text input efficiency and usability.[cite: 1]</li>
-                            <li>Developed a TensorFlow/Keras AI engine combining BiLSTM gesture recognition with Trie autocomplete.[cite: 1]</li>
-                            <li>Implemented haptic and audio feedback systems to reduce character input errors and visual dependency.[cite: 1]</li>
-                            <li><span class="font-semibold">Skills:</span> TensorFlow/Keras, Deep Learning, BiLSTM, Data Structures, AI Prediction Systems, HCI[cite: 1]</li>
-                        </ul>
-                    </div>
-
-                </div>
-            </section>
-
-            <!-- Interests -->
-            <section>
-                <h2 class="text-2xl font-bold border-b-2 border-slate-200 pb-2 mb-6 text-slate-800">Interests</h2>
-                <p class="text-gray-700">Animation, Video Editing, Filmmaking, Photography, Badminton.[cite: 1]</p>
-            </section>
-
         </div>
+
+        <!-- Filter Cell -->
+        <div class="grid-cell">
+            <div class="filter-prompt mono">> ./filter_logs.sh --stack</div>
+            <div class="filter-tags mono" id="filter-container">
+                <button class="tag-btn active" data-filter="all">ALL</button>
+                <button class="tag-btn" data-filter="react">React[cite: 2]</button>
+                <button class="tag-btn" data-filter="node">Node.js[cite: 2]</button>
+                <button class="tag-btn" data-filter="python">Python[cite: 2]</button>
+                <button class="tag-btn" data-filter="ml">TensorFlow/PyTorch[cite: 2]</button>
+                <button class="tag-btn" data-filter="leadership">Leadership[cite: 2]</button>
+            </div>
+        </div>
+
+        <!-- Logs Cell -->
+        <div class="grid-cell" style="padding: 0;">
+            <div class="log-header mono">
+                <div>Timestamp</div>
+                <div>Commit / Task</div>
+                <div style="text-align: right;">Latency</div>
+                <div style="padding-left: 1rem;">Tags</div>
+            </div>
+            
+            <div id="log-list">
+                <!-- Xerox Project -->
+                <div class="log-entry mono" data-tags="react node">
+                    <div class="log-meta">Mar 2025 - Present[cite: 2]</div>
+                    <div class="log-title">Xerox Automation System[cite: 2]</div>
+                    <div class="log-latency">12ms</div>
+                    <div class="log-tags">
+                        <span class="log-tag">React[cite: 2]</span>
+                        <span class="log-tag">Node.js[cite: 2]</span>
+                        <span class="log-tag">Express[cite: 2]</span>
+                        <span class="log-tag">MongoDB[cite: 2]</span>
+                    </div>
+                    <div class="log-details">
+                        <ul style="margin-left: 1rem; color: var(--text-color); margin-bottom: 1rem; font-family: 'Inter', sans-serif;">
+                            <li>Architected a React and Node.js automation platform to streamline print pre-ordering and document workflows.[cite: 2]</li>
+                            <li>Onboarded 867 users in the first week after launch, highlighting rapid user growth and platform scalability.[cite: 2]</li>
+                            <li>Engineered a secure Express.js backend with OTP/QR authentication and integrated payment processing.[cite: 2]</li>
+                            <li>Implemented batch PDF upload pipelines to optimize high-volume document handling and request reliability.[cite: 2]</li>
+                        </ul>
+                        <div style="color: var(--accent-color);">Live Demo: zerox.studio[cite: 2]</div>
+                        <div class="code-snippet">
+<span style="color: #ff7b72;">import</span> express <span style="color: #ff7b72;">from</span> 'express';
+<span style="color: #ff7b72;">const</span> router = express.Router();
+
+<span style="color: #8b949e;">// Secure backend payload validation mapping[cite: 2]</span>
+router.post('/upload', batchPDFPipeline, authenticateOTP, <span style="color: #ff7b72;">async</span> (req, res) => {
+    <span style="color: #ff7b72;">const</span> status = <span style="color: #ff7b72;">await</span> processDocumentQueue(req.files);
+    <span style="color: #ff7b72;">return</span> res.status(200).json({ success: true, processed: status });
+});
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HDR Image Reconstruction -->
+                <div class="log-entry mono" data-tags="python ml">
+                    <div class="log-meta">2025[cite: 2]</div>
+                    <div class="log-title">HDR Image Reconstruction CNN[cite: 2]</div>
+                    <div class="log-latency">48ms</div>
+                    <div class="log-tags">
+                        <span class="log-tag">PyTorch[cite: 2]</span>
+                        <span class="log-tag">CNNs[cite: 2]</span>
+                        <span class="log-tag">Computer Vision[cite: 2]</span>
+                        <span class="log-tag">OpenCV[cite: 2]</span>
+                    </div>
+                    <div class="log-details">
+                        <ul style="margin-left: 1rem; color: var(--text-color); margin-bottom: 1rem; font-family: 'Inter', sans-serif;">
+                            <li>Engineered a PyTorch CNN pipeline for converting LDR images into high-fidelity HDR outputs.[cite: 2]</li>
+                            <li>Optimized image preprocessing and inference workflows using OpenCV and NumPy computer vision operations.[cite: 2]</li>
+                            <li>Developed a Streamlit application for real-time HDR generation, visualization, and image comparison.[cite: 2]</li>
+                        </ul>
+                        <div class="code-snippet">
+<span style="color: #ff7b72;">import</span> torch.nn <span style="color: #ff7b72;">as</span> nn
+<span style="color: #ff7b72;">import</span> cv2 <span style="color: #ff7b72;">as</span> cv <span style="color: #8b949e;"># Optimization using OpenCV[cite: 2]</span>
+
+<span style="color: #ff7b72;">class</span> <span style="color: #d2a8ff;">HDRReconstructionNet</span>(nn.Module):
+    <span style="color: #ff7b72;">def</span> <span style="color: #d2a8ff;">__init__</span>(self):
+        <span style="color: #79c0ff;">super</span>().__init__()
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, padding=1),
+            nn.ReLU(inplace=<span style="color: #79c0ff;">True</span>)
+        ) <span style="color: #8b949e;"># PyTorch CNN pipeline implementation[cite: 2]</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stick Typing -->
+                <div class="log-entry mono" data-tags="ml python">
+                    <div class="log-meta">2026[cite: 2]</div>
+                    <div class="log-title">Stick Typing - AI Powered UI[cite: 2]</div>
+                    <div class="log-latency">24ms</div>
+                    <div class="log-tags">
+                        <span class="log-tag">TensorFlow/Keras[cite: 2]</span>
+                        <span class="log-tag">BiLSTM[cite: 2]</span>
+                        <span class="log-tag">HCI[cite: 2]</span>
+                    </div>
+                    <div class="log-details">
+                        <ul style="margin-left: 1rem; color: var(--text-color); margin-bottom: 1rem; font-family: 'Inter', sans-serif;">
+                            <li>Designed a dual-thumbstick typing interface to improve controller-based text input efficiency and usability.[cite: 2]</li>
+                            <li>Developed a TensorFlow/Keras AI engine combining BiLSTM gesture recognition with Trie autocomplete.[cite: 2]</li>
+                            <li>Implemented haptic and audio feedback systems to reduce character input errors and visual dependency.[cite: 2]</li>
+                        </ul>
+                        <div class="code-snippet">
+model = tf.keras.Sequential([
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(128, return_sequences=True)),
+    tf.keras.layers.Dense(num_characters, activation='softmax')
+]) <span style="color: #8b949e;"># BiLSTM gesture recognition logic[cite: 2]</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- JP Morgan -->
+                <div class="log-entry mono" data-tags="leadership react node">
+                    <div class="log-meta">Event / Extracurricular[cite: 2]</div>
+                    <div class="log-title">J.P. Morgan Chase Code for Good[cite: 2]</div>
+                    <div class="log-latency">08ms</div>
+                    <div class="log-tags">
+                        <span class="log-tag">MERN Stack[cite: 2]</span>
+                        <span class="log-tag">Agile[cite: 2]</span>
+                    </div>
+                    <div class="log-details">
+                        <ul style="margin-left: 1rem; color: var(--text-color); margin-bottom: 1rem; font-family: 'Inter', sans-serif;">
+                            <li>Spearheaded a 7-member agile engineering team to architect a MERN-stack application for automating leftover food distribution; delivered the solution within a highly competitive 24-hour sprint.[cite: 2]</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Smart India Hackathon -->
+                <div class="log-entry mono" data-tags="leadership react">
+                    <div class="log-meta">Event / Extracurricular[cite: 2]</div>
+                    <div class="log-title">Smart India Hackathon[cite: 2]</div>
+                    <div class="log-latency">05ms</div>
+                    <div class="log-tags">
+                        <span class="log-tag">Frontend Architecture[cite: 2]</span>
+                    </div>
+                    <div class="log-details">
+                        <ul style="margin-left: 1rem; color: var(--text-color); margin-bottom: 1rem; font-family: 'Inter', sans-serif;">
+                            <li>Engineered the frontend architecture for an urban planning platform; directed a multidisciplinary team through requirement analysis to deliver a centralized municipal resource-sharing platform.[cite: 2]</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                 <!-- Robotics Club -->
+                <div class="log-entry mono" data-tags="leadership">
+                    <div class="log-meta">Event / Extracurricular[cite: 2]</div>
+                    <div class="log-title">Secretary, Robotics Club GRIET[cite: 2]</div>
+                    <div class="log-latency">02ms</div>
+                    <div class="log-tags">
+                        <span class="log-tag">Mentorship[cite: 2]</span>
+                    </div>
+                    <div class="log-details">
+                        <ul style="margin-left: 1rem; color: var(--text-color); margin-bottom: 1rem; font-family: 'Inter', sans-serif;">
+                            <li>Orchestrated inter-college events and technical workshops by coordinating technical and creative teams; mentored junior members in end-to-end robotics project development.[cite: 2]</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- Extraneous Data Cell -->
+        <div class="grid-cell" style="border-top: 1px solid var(--border-color);">
+            <div class="mono" style="color: var(--muted-color); font-size: 12px; margin-bottom: 0.5rem;">> cat interests.txt</div>
+            <div class="mono" style="color: var(--text-color);">Animation, Video Editing, Filmmaking, Photography, Badminton.[cite: 2]</div>
+        </div>
+    </main>
+
+    <div class="keybinds mono">
+        <span class="key">j</span>/<span class="key">k</span> Navigate &nbsp;&nbsp; <span class="key">Enter</span> Expand/Collapse
     </div>
 
+    <script>
+        // Clock functionality
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toISOString().replace('T', ' ').substring(0, 19) + 'Z';
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Tag Filtering
+        const filterBtns = document.querySelectorAll('.tag-btn');
+        const logEntries = document.querySelectorAll('.log-entry');
+        
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Update active state
+                filterBtns.forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                const filter = e.target.getAttribute('data-filter');
+                
+                logEntries.forEach(entry => {
+                    if (filter === 'all' || entry.getAttribute('data-tags').includes(filter)) {
+                        entry.style.display = 'grid';
+                    } else {
+                        entry.style.display = 'none';
+                        entry.classList.remove('expanded');
+                        entry.classList.remove('active-nav');
+                    }
+                });
+                
+                resetNavigation();
+            });
+        });
+
+        // Keyboard Navigation (j/k/Enter)
+        let activeIndex = -1;
+        let visibleEntries = Array.from(logEntries);
+
+        function resetNavigation() {
+            activeIndex = -1;
+            visibleEntries = Array.from(logEntries).filter(entry => entry.style.display !== 'none');
+            logEntries.forEach(entry => entry.classList.remove('active-nav'));
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (visibleEntries.length === 0) return;
+
+            if (e.key === 'j') {
+                if (activeIndex < visibleEntries.length - 1) {
+                    if (activeIndex >= 0) visibleEntries[activeIndex].classList.remove('active-nav');
+                    activeIndex++;
+                    visibleEntries[activeIndex].classList.add('active-nav');
+                    
+                    // Respect reduced motion for scrolling
+                    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    visibleEntries[activeIndex].scrollIntoView({ 
+                        block: 'nearest', 
+                        behavior: prefersReducedMotion ? 'auto' : 'smooth' 
+                    });
+                }
+            } else if (e.key === 'k') {
+                if (activeIndex > 0) {
+                    visibleEntries[activeIndex].classList.remove('active-nav');
+                    activeIndex--;
+                    visibleEntries[activeIndex].classList.add('active-nav');
+                    
+                    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    visibleEntries[activeIndex].scrollIntoView({ 
+                        block: 'nearest', 
+                        behavior: prefersReducedMotion ? 'auto' : 'smooth' 
+                    });
+                }
+            } else if (e.key === 'Enter') {
+                if (activeIndex >= 0) {
+                    visibleEntries[activeIndex].classList.toggle('expanded');
+                }
+            }
+        });
+
+        // Click to expand functionality
+        logEntries.forEach((entry, index) => {
+            entry.addEventListener('click', () => {
+                entry.classList.toggle('expanded');
+                
+                // Update active index based on click
+                logEntries.forEach(e => e.classList.remove('active-nav'));
+                entry.classList.add('active-nav');
+                activeIndex = visibleEntries.indexOf(entry);
+            });
+        });
+    </script>
 </body>
 </html>
